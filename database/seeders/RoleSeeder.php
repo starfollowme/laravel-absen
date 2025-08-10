@@ -1,6 +1,6 @@
 <?php
 
-
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -10,33 +10,18 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            [
-                'RoleID' => 1,
-                'RoleName' => 'Super Admin',
-                'RoleDescription' => 'Administrator with full system access'
-            ],
-            [
-                'RoleID' => 2,
-                'RoleName' => 'Guru Matapelajaran',
-                'RoleDescription' => 'Subject teacher with attendance recording rights'
-            ],
-            [
-                'RoleID' => 3,
-                'RoleName' => 'Walikelas',
-                'RoleDescription' => 'Class teacher with student management rights'
-            ],
-            [
-                'RoleID' => 4,
-                'RoleName' => 'Kesiswaan',
-                'RoleDescription' => 'Student affairs officer with attendance management rights'
-            ],
-            [
-                'RoleID' => 5,
-                'RoleName' => 'Kepala Sekolah',
-                'RoleDescription' => 'Principal with read-only access to reports'
-            ]
+            ['RoleName' => 'Super Admin', 'RoleDescription' => 'Administrator with full system access'],
+            ['RoleName' => 'Guru Matapelajaran', 'RoleDescription' => 'Subject teacher with attendance rights'],
+            ['RoleName' => 'Walikelas', 'RoleDescription' => 'Class teacher with student management rights'],
+            ['RoleName' => 'Kesiswaan', 'RoleDescription' => 'Student affairs officer'],
+            ['RoleName' => 'Kepala Sekolah', 'RoleDescription' => 'Principal with report viewing access']
         ];
 
-        DB::table('role')->insert($roles);
+        foreach ($roles as $role) {
+            DB::table('roles')->updateOrInsert(
+                ['RoleName' => $role['RoleName']],
+                ['RoleDescription' => $role['RoleDescription']]
+            );
+        }
     }
 }

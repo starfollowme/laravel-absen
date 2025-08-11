@@ -4,47 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
     use HasFactory;
 
     /**
-     * The table associated with the model.
+     * Nama tabel yang terhubung dengan model ini.
+     * Secara eksplisit kita beritahu Laravel nama tabelnya adalah 'roles'.
      *
      * @var string
      */
-    protected $table = 'role';
+    protected $table = 'roles';
 
     /**
-     * The primary key associated with the table.
+     * Primary key untuk model ini.
+     * Kita pastikan Laravel tahu primary key-nya adalah 'id'.
      *
      * @var string
      */
-    protected $primaryKey = 'RoleID';
+    protected $primaryKey = 'id';
 
     /**
-     * Indicates if the model should be timestamped.
+     * Menonaktifkan auto-increment jika primary key bukan integer.
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $incrementing = true;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Relasi many-to-many ke model User.
      */
-    protected $fillable = [
-        'RoleName',
-        'RoleDescription',
-    ];
-
-    /**
-     * The users that belong to the role.
-     */
-    public function tenagaPendidik()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(TenagaPendidik::class, 'tenaga_pendidik_role_mapping', 'RoleID', 'NIP');
+        return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
     }
 }

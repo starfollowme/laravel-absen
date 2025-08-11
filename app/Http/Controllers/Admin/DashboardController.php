@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Absensi;
+use App\Models\Murid;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -13,11 +17,29 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Anda bisa menambahkan logika untuk mengambil data di sini
-        // Contoh: $jumlah_guru = TenagaPendidik::count();
+        $user = Auth::user();
+        $today = Carbon::today();
 
-        $user = Auth::user(); // Mengambil data user yang sedang login
+        // Menggunakan Eloquent Model untuk mengambil data (lebih bersih dan standar)
+        $totalGuru = User::count();
+        $totalMurid = Murid::count();
 
-        return view('admin.dashboard', compact('user'));
+        // Menghitung absensi hari ini
+        $hadirHariIni = Absensi::whereDate('tanggal', $today)
+                               ->whereIn('status', ['Hadir', 'Terlambat'])
+                               ->count();
+
+        // Menghitung persentase, aman dari pembagian dengan nol
+        $persentaseAbsensi = 0;
+        if ($totalMurid > 0) {
+            $persentaseAbsensi = round(($hadirHariIni / $totalMurid) * 100);
+        }
+
+        return view('admin.dashboard', compact(
+            'user',
+            'totalGuru',
+            'totalMurid',
+            'persentaseAbsensi'
+        ));
     }
 }

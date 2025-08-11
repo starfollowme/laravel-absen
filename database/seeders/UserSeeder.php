@@ -12,30 +12,54 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                'NIP' => '196501011990031001',
+                'nip' => '196501011990031001', // Kolom diubah ke snake_case
                 'name' => 'Super Admin',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password'),
+                'no_telp' => '081000000001',
+                'alamat' => 'Kantor Pusat',
             ],
             [
-                'NIP' => '197203051995122001',
+                'nip' => '197203051995122001',
                 'name' => 'Guru A',
-                'email' => 'guru1@example.com',
+                'email' => 'guru.a@example.com',
                 'password' => Hash::make('password'),
+                'no_telp' => '081000000002',
+                'alamat' => 'Ruang Guru',
             ],
             [
-                'NIP' => '198712152010122003',
-                'name' => 'Guru B',
-                'email' => 'guru2@example.com',
+                'nip' => '198712152010122003',
+                'name' => 'Guru B (Walikelas)',
+                'email' => 'guru.b@example.com',
                 'password' => Hash::make('password'),
+                'no_telp' => '081000000003',
+                'alamat' => 'Ruang Walikelas',
+            ],
+             [
+                'nip' => '197812312022011001',
+                'name' => 'Budi Santoso',
+                'email' => 'budi@guru.com',
+                'password' => Hash::make('password'),
+                'no_telp' => '081234567890',
+                'alamat' => 'Jl. Pendidikan No. 1',
+            ],
+            [
+                'nip' => '198504152022011002',
+                'name' => 'Siti Aminah',
+                'email' => 'siti@guru.com',
+                'password' => Hash::make('password'),
+                'no_telp' => '081234567891',
+                'alamat' => 'Jl. Pendidikan No. 2',
             ],
         ];
 
         foreach ($users as $user) {
-
             DB::table('users')->updateOrInsert(
-                ['NIP' => $user['NIP']],
-                $user
+                ['nip' => $user['nip']], // Kunci unik untuk pengecekan
+                array_merge($user, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])
             );
         }
     }

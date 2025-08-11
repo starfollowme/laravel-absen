@@ -11,25 +11,32 @@ class KelasSeeder extends Seeder
     {
         $now = Carbon::now();
 
+        // Kolom disesuaikan ke snake_case dan KelasID dihapus karena auto-increment
         $kelas = [
-            ['KelasID' => 1, 'NamaKelas' => 'X RPL 1',   'Tingkat' => 'X',   'Jurusan' => 'RPL', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 2, 'NamaKelas' => 'X RPL 2',   'Tingkat' => 'X',   'Jurusan' => 'RPL', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 3, 'NamaKelas' => 'XI RPL 1',  'Tingkat' => 'XI',  'Jurusan' => 'RPL', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 4, 'NamaKelas' => 'XI RPL 2',  'Tingkat' => 'XI',  'Jurusan' => 'RPL', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 5, 'NamaKelas' => 'XII RPL 1', 'Tingkat' => 'XII', 'Jurusan' => 'RPL', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 6, 'NamaKelas' => 'XII RPL 2', 'Tingkat' => 'XII', 'Jurusan' => 'RPL', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 7, 'NamaKelas' => 'X TKJ 1',   'Tingkat' => 'X',   'Jurusan' => 'TKJ', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 8, 'NamaKelas' => 'X TKJ 2',   'Tingkat' => 'X',   'Jurusan' => 'TKJ', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 9, 'NamaKelas' => 'XI TKJ 1',  'Tingkat' => 'XI',  'Jurusan' => 'TKJ', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 10,'NamaKelas' => 'XI TKJ 2',  'Tingkat' => 'XI',  'Jurusan' => 'TKJ', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 11,'NamaKelas' => 'XII TKJ 1', 'Tingkat' => 'XII', 'Jurusan' => 'TKJ', 'created_at' => $now, 'updated_at' => $now],
-            ['KelasID' => 12,'NamaKelas' => 'XII TKJ 2', 'Tingkat' => 'XII', 'Jurusan' => 'TKJ', 'created_at' => $now, 'updated_at' => $now],
+            ['nama_kelas' => 'X RPL 1',   'tingkat' => 'X',   'jurusan' => 'RPL'],
+            ['nama_kelas' => 'X RPL 2',   'tingkat' => 'X',   'jurusan' => 'RPL'],
+            ['nama_kelas' => 'XI RPL 1',  'tingkat' => 'XI',  'jurusan' => 'RPL'],
+            ['nama_kelas' => 'XI RPL 2',  'tingkat' => 'XI',  'jurusan' => 'RPL'],
+            ['nama_kelas' => 'XII RPL 1', 'tingkat' => 'XII', 'jurusan' => 'RPL'],
+            ['nama_kelas' => 'XII RPL 2', 'tingkat' => 'XII', 'jurusan' => 'RPL'],
+            ['nama_kelas' => 'X TKJ 1',   'tingkat' => 'X',   'jurusan' => 'TKJ'],
+            ['nama_kelas' => 'X TKJ 2',   'tingkat' => 'X',   'jurusan' => 'TKJ'],
+            ['nama_kelas' => 'XI TKJ 1',  'tingkat' => 'XI',  'jurusan' => 'TKJ'],
+            ['nama_kelas' => 'XI TKJ 2',  'tingkat' => 'XI',  'jurusan' => 'TKJ'],
+            ['nama_kelas' => 'XII TKJ 1', 'tingkat' => 'XII', 'jurusan' => 'TKJ'],
+            ['nama_kelas' => 'XII TKJ 2', 'tingkat' => 'XII', 'jurusan' => 'TKJ'],
         ];
 
-        DB::table('kelas')->upsert(
-            $kelas,
-            ['KelasID'], // gunakan KelasID sebagai key unik
-            ['NamaKelas', 'Tingkat', 'Jurusan', 'updated_at'] // kolom yang diupdate jika sudah ada
-        );
+        foreach ($kelas as $k) {
+             DB::table('kelas')->updateOrInsert(
+                ['nama_kelas' => $k['nama_kelas']], // Kunci unik alami
+                [
+                    'tingkat' => $k['tingkat'],
+                    'jurusan' => $k['jurusan'],
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ]
+            );
+        }
     }
 }

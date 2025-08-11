@@ -5,88 +5,80 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\User; // Diasumsikan model User ada
+use App\Models\Murid; // Diasumsikan model Murid ada
 
 class AbsensiSeeder extends Seeder
 {
+    /**
+     * Catatan: Pastikan UserSeeder dan MuridSeeder sudah dijalankan sebelumnya
+     * agar data NIP guru dan NIS murid tersedia di database.
+     */
     public function run(): void
     {
         $absensiData = [];
         $today = Carbon::now();
 
+        // Ambil data murid dan user untuk dicocokkan (lebih efisien)
+        $muridNisMap = Murid::pluck('id', 'nis')->all();
+        $userNipMap = User::pluck('id', 'nip')->all();
+
+        $sampleNIS = array_keys($muridNisMap);
+        $nipGuru = array_keys($userNipMap);
+
+        // Jika data user/murid kosong, hentikan seeder
+        if (empty($sampleNIS) || empty($nipGuru)) {
+            $this->command->info('Tidak ada data Murid atau User. Lewati AbsensiSeeder.');
+            return;
+        }
 
         for ($i = 0; $i < 30; $i++) {
             $tanggal = $today->copy()->subDays($i);
-
 
             if ($tanggal->isWeekend()) {
                 continue;
             }
 
-
-            $sampleNIS = [
-                '2306510490',
-                '2306510491',
-                '2306510492',
-                '2306510493',
-                '2306510494',
-                '2306510495',
-                '2306510496',
-                '2306510498',
-                '2306510499',
-                '2306510500',
-                '2306510501',
-                '2306510502',
-                '2306510503',
-                '2306510504',
-                '2306510505',
-                '2306510506',
-                '2306510507',
-                '2306510508',
-                '2306510509',
-                '2306510510'
-            ];
-
-
-            $nipGuru = [
-                '196501011990031001', // Super Admin
-                '197203051995122001', // Guru
-                '198005101998032002', // Guru
-                '198712152010122003', // Walikelas
-                '199002201012122004', // Walikelas
-                '198508181998032005'  // Kesiswaan
-            ];
-
-            foreach ($sampleNIS as $index => $nis) {
-                // Random status absensi
+            foreach ($sampleNIS as $nis) {
                 $statusOptions = ['Hadir', 'Sakit', 'Izin', 'Alpha'];
                 $status = $statusOptions[array_rand($statusOptions)];
 
-                // Random jam datang (07:00 - 07:30 untuk hadir, null untuk lainnya)
                 $jamDatang = null;
                 $keterangan = null;
 
                 if ($status === 'Hadir') {
-                    $jamDatang = '07:' . str_pad(rand(0, 30), 2, '0', STR_PAD_LEFT) . ':00';
+                    $hour = '07';
+                    $minute = rand(0, 30);
+                    if ($minute > 15) { // Contoh logika untuk terlambat
+                        $status = 'Terlambat';
+                    }
+                    $jamDatang = $hour . ':' . str_pad($minute, 2, '0', STR_PAD_LEFT) . ':00';
                 } elseif ($status === 'Sakit') {
                     $keterangan = 'Sakit demam';
                 } elseif ($status === 'Izin') {
                     $keterangan = 'Keperluan keluarga';
-                } else {
+                } else { // Alpha
                     $keterangan = 'Tanpa keterangan';
                 }
 
+                // Ambil id dari map yang sudah dibuat
+                $muridId = $muridNisMap[$nis];
+                $userId = $userNipMap[$nipGuru[array_rand($nipGuru)]];
+
                 $absensiData[] = [
-                    'Kode_Absensi' => 'ABS' . $tanggal->format('Ymd') . str_pad($index + 1, 3, '0', STR_PAD_LEFT),
-                    'Tanggal' => $tanggal->format('Y-m-d'),
-                    'JamDatang' => $jamDatang ?: '00:00:00',
-                    'StatusAbsensi' => $status,
-                    'Keterangan' => $keterangan,
-                    'NIP' => $nipGuru[array_rand($nipGuru)],
-                    'NIS' => $nis
+                    'murid_id' => $muridId,
+                    'user_id' => $userId,
+                    'tanggal' => $tanggal->format('Y-m-d'),
+                    'jam_datang' => $jamDatang,
+                    'status' => $status,
+                    'keterangan' => $keterangan,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
             }
         }
 
+        // Insert data dalam batch untuk performa yang lebih baik
         DB::table('absensi')->insert($absensiData);
     }
 }

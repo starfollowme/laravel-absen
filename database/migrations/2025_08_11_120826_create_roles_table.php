@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->string('RoleName')->unique();
-            $table->string('RoleDescription')->nullable();
+            $table->string('role_name')->unique();
+            $table->text('role_description')->nullable();
             $table->timestamps();
         });
     }

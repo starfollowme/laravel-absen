@@ -9,18 +9,19 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
+        // Nama kolom disesuaikan dengan migrasi (snake_case)
         $roles = [
-            ['RoleName' => 'Super Admin', 'RoleDescription' => 'Administrator with full system access'],
-            ['RoleName' => 'Guru Matapelajaran', 'RoleDescription' => 'Subject teacher with attendance rights'],
-            ['RoleName' => 'Walikelas', 'RoleDescription' => 'Class teacher with student management rights'],
-            ['RoleName' => 'Kesiswaan', 'RoleDescription' => 'Student affairs officer'],
-            ['RoleName' => 'Kepala Sekolah', 'RoleDescription' => 'Principal with report viewing access']
+            ['role_name' => 'Super Admin', 'role_description' => 'Administrator with full system access'],
+            ['role_name' => 'Guru Matapelajaran', 'role_description' => 'Subject teacher with attendance rights'],
+            ['role_name' => 'Walikelas', 'role_description' => 'Class teacher with student management rights'],
+            ['role_name' => 'Kesiswaan', 'role_description' => 'Student affairs officer'],
+            ['role_name' => 'Kepala Sekolah', 'role_description' => 'Principal with report viewing access']
         ];
 
         foreach ($roles as $role) {
             DB::table('roles')->updateOrInsert(
-                ['RoleName' => $role['RoleName']],
-                ['RoleDescription' => $role['RoleDescription']]
+                ['role_name' => $role['role_name']],
+                ['role_description' => $role['role_description'], 'updated_at' => now()]
             );
         }
     }

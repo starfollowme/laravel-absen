@@ -4,29 +4,26 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-// IMPORT SEMUA CLASS SEEDER YANG AKAN DIPANGGIL
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\KelasSeeder;
-use Database\Seeders\TenagaPendidikSeeder;
-use Database\Seeders\TenagaPendidikRoleMappingSeeder;
-use Database\Seeders\MuridSeeder;
-use Database\Seeders\AbsensiSeeder;
-
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * Urutan pemanggilan disesuaikan untuk memastikan data master (role, user, kelas)
+     * ada sebelum data transaksional (relasi role, murid, absensi) dibuat.
      */
     public function run(): void
     {
         $this->call([
+            // 1. Data Master
             RoleSeeder::class,
-            UserSeeder::class,
-            GuruSeeder::class,
+            UserSeeder::class,      // Menggantikan GuruSeeder dan UserSeeder lama
             KelasSeeder::class,
-            RoleUserSeeder::class,
-            MuridSeeder::class,
-            AbsensiSeeder::class,
+
+            // 2. Data Relasional dan Turunan
+            RoleUserSeeder::class,  // Membutuhkan UserSeeder dan RoleSeeder
+            MuridSeeder::class,     // Membutuhkan KelasSeeder
+            AbsensiSeeder::class,   // Membutuhkan MuridSeeder dan UserSeeder
         ]);
     }
 }

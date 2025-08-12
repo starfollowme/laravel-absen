@@ -4,18 +4,28 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\User; // Pastikan model User ada dan benar
+use App\Models\User;
 
 class RoleUserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Mapping antara NIP dan ID Role
         $mappings = [
-            ['nip' => '196501011990031001', 'role_id' => 1], // Super Admin
-            ['nip' => '197203051995122001', 'role_id' => 2], // Guru A sebagai Guru Matapelajaran
-            ['nip' => '198712152010122003', 'role_id' => 3], // Guru B sebagai Walikelas
-            ['nip' => '198712152010122003', 'role_id' => 2], // Guru B juga sebagai Guru Matapelajaran
+            // Super Admin
+            ['nip' => '196501011990031001', 'role_id' => 1],
+
+            // Guru A (hanya Guru Matapelajaran)
+            ['nip' => '197203051995122001', 'role_id' => 2],
+
+            // Guru B (Walikelas dan juga Guru Matapelajaran)
+            ['nip' => '198712152010122003', 'role_id' => 3],
+            ['nip' => '198712152010122003', 'role_id' => 2],
+
+            // Budi Santoso (Guru Matapelajaran)
+            ['nip' => '197812312022011001', 'role_id' => 2],
+
+            // Siti Aminah (Guru Matapelajaran)
+            ['nip' => '198504152022011002', 'role_id' => 2],
         ];
 
         foreach ($mappings as $map) {
@@ -23,7 +33,7 @@ class RoleUserSeeder extends Seeder
             $user = User::where('nip', $map['nip'])->first();
 
             if ($user) {
-                // Gunakan updateOrInsert untuk mencegah duplikasi relasi
+                // PERBAIKAN: Gunakan 'user_id' => $user->id, bukan 'nip'
                 DB::table('role_user')->updateOrInsert(
                     [
                         'user_id' => $user->id,

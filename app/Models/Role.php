@@ -12,26 +12,14 @@ class Role extends Model
 
     /**
      * Nama tabel yang terhubung dengan model ini.
-     * Secara eksplisit kita beritahu Laravel nama tabelnya adalah 'roles'.
-     *
      * @var string
      */
     protected $table = 'roles';
 
-    /**
-     * Primary key untuk model ini.
-     * Kita pastikan Laravel tahu primary key-nya adalah 'id'.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * Menonaktifkan auto-increment jika primary key bukan integer.
-     *
-     * @var bool
-     */
-    public $incrementing = true;
+    protected $fillable = [
+        'role_name',
+        'role_description',
+    ];
 
     /**
      * Relasi many-to-many ke model User.

@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // <-- Import Log facade
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
     /**
-     * Menampilkan halaman form login.
+     * Menampilkan form login.
      */
     public function showLoginForm()
     {
@@ -17,42 +19,59 @@ class LoginController extends Controller
     }
 
     /**
-     * Memproses permintaan login.
+     * Menangani permintaan login.
      */
     public function login(Request $request)
     {
-        // Validasi input
-        $credentials = $request->validate([
-            'NIP' => 'required|string',
-            'Password' => 'required|string',
+        $request->validate([
+            'nip' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        // Coba untuk melakukan autentikasi
-        // Kita menggunakan guard 'web' yang sudah kita atur untuk model TenagaPendidik
-        if (Auth::guard('web')->attempt(['NIP' => $request->NIP, 'password' => $request->Password], $request->filled('remember'))) {
+        if (Auth::attempt(['nip' => $request->nip, 'password' => $request->password], $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            // Jika berhasil, redirect ke dashboard admin
-            return redirect()->intended('/admin/dashboard');
+            $user = Auth::user();
+
+            // --- KODE DEBUGGING ---
+            $roles = $user->roles()->pluck('role_name');
+            Log::info('Login berhasil untuk user: ' . $user->name . ' (NIP: ' . $user->nip . ')');
+            Log::info('Peran yang ditemukan: ' . $roles->implode(', '));
+            // --- AKHIR KODE DEBUGGING ---
+
+            if ($user->roles()->where('role_name', 'Super Admin')->exists()) {
+                Log::info('Mengarahkan ke dashboard admin.');
+                return redirect()->intended(route('admin.dashboard'));
+            }
+
+            if ($user->roles()->whereIn('role_name', ['Guru Matapelajaran', 'Walikelas'])->exists()) {
+                Log::info('Mengarahkan ke dashboard guru.');
+                return redirect()->intended(route('guru.dashboard'));
+            }
+
+            Log::warning('Pengguna tidak punya peran valid. Logout.');
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'nip' => 'Anda tidak memiliki peran yang valid untuk mengakses sistem.',
+            ]);
         }
 
-        // Jika gagal, kembali ke halaman login dengan pesan error
-        return back()->withErrors([
-            'NIP' => 'NIP atau Password yang Anda masukkan salah.',
-        ])->onlyInput('NIP');
+        throw ValidationException::withMessages([
+            'nip' => __('auth.failed'),
+        ]);
     }
 
     /**
-     * Memproses permintaan logout.
+     * Menangani proses logout.
      */
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        // Redirect ke halaman login setelah logout
         return redirect('/login');
     }
 }

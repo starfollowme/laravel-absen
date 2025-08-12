@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Murid extends Model
+class Kelas extends Model
 {
     use HasFactory;
 
@@ -16,18 +16,16 @@ class Murid extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'nis',
-        'nama',
-        'tanggal_lahir',
-        'kelas_id',
-        'gambar',
+        'nama_kelas',
+        'jurusan',
+        'tingkat',
     ];
 
     /**
      * Nama tabel yang terhubung dengan model ini.
      * @var string
      */
-    protected $table = 'murid';
+    protected $table = 'kelas';
 
     /**
      * Primary key untuk model ini.
@@ -36,11 +34,11 @@ class Murid extends Model
     protected $primaryKey = 'id';
 
     /**
-     * Mendefinisikan relasi many-to-one ke model Kelas.
-     * Satu murid dimiliki oleh satu kelas.
+     * Mendefinisikan relasi one-to-many ke model Murid.
+     * Satu kelas memiliki banyak murid.
      */
-    public function kelas(): BelongsTo
+    public function murid(): HasMany
     {
-        return $this->belongsTo(Kelas::class, 'kelas_id', 'id');
+        return $this->hasMany(Murid::class, 'kelas_id', 'id');
     }
 }

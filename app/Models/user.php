@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'nip', // Pastikan semua kolom yang ingin diisi ada di sini
+        'nip',
         'no_telp',
         'alamat',
     ];
@@ -51,6 +51,7 @@ class User extends Authenticatable
 
     /**
      * Mendefinisikan relasi many-to-many ke model Role.
+     * Ini adalah method yang hilang dan menyebabkan error.
      */
     public function roles(): BelongsToMany
     {
